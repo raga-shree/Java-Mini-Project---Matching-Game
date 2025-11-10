@@ -1,31 +1,32 @@
 package game;
 
 /**
- *
- * @author Rajesh Kumar Sahanee
+ * Sound.java - Handles audio loading and playback for the Matching Game.
+ * This class can load a sound file from the project resources and play it.
+ * It uses Java's javax.sound.sampled API to manage audio streams.
  */
+
 import java.io.*;
 import java.net.URL;
 import javax.sound.sampled.*;
 
-/**
- * The Sound encapsulates a sound that can be opened from the file system and
- * later played.
- */
+
 public class Sound {
 
+     // Format of the audio file (sample rate, bit depth, channels, etc.)
     private AudioFormat format;
+    
+    // Stores the raw audio data as bytes
     private byte[] samples;
 
-    /**
-     * Opens a sound from a file.
-     */
+    // Constructor -  Loads a sound file from a given URL
     public Sound(URL filename) {
         try {
             // open the audio input stream
             AudioInputStream stream
                     = AudioSystem.getAudioInputStream(filename);
 
+            // Store the auido format
             format = stream.getFormat();
 
             // get the audio samples
@@ -92,7 +93,7 @@ public class Sound {
         // start the line
         line.start();
 
-        //copy data to the line
+        // Continuously read and write audio data to the output line
         try {
             int numBytesRead = 0;
             while (numBytesRead != -1) {
