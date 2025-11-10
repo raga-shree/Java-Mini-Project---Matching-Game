@@ -1,118 +1,88 @@
 package game;
 
-/**
- * Sound.java - Handles audio loading and playback for the Matching Game.
- * This class can load a sound file from the project resources and play it.
- * It uses Java's javax.sound.sampled API to manage audio streams.
- */
-
 import java.io.*;
 import java.net.URL;
 import javax.sound.sampled.*;
 
 
+/**
+ * Improved Sound utility class.
+ * Simplifies audio playback using Clip (short sound effects).
+ * 
+ * Features:
+ * - play(), stop(), loop()
+ * - adjustable volume
+ * - supports loading from URL or File
+ */
+
 public class Sound {
 
-     // Format of the audio file (sample rate, bit depth, channels, etc.)
-    private AudioFormat format;
-    
-    // Stores the raw audio data as bytes
-    private byte[] samples;
+    private Clip clip;
+    private FloatControl volumeControl;
 
-    // Constructor -  Loads a sound file from a given URL
-    public Sound(URL filename) {
-        try {
-            // open the audio input stream
-            AudioInputStream stream
-                    = AudioSystem.getAudioInputStream(filename);
-
-            // Store the auido format
-            format = stream.getFormat();
-
-            // get the audio samples
-            samples = getSamples(stream);
-        } catch (UnsupportedAudioFileException ex) {
-            System.out.println(ex);
-        } catch (IOException ex) {
-            System.out.println(ex);
-        }
-    }
-
-    /**
-     * Gets the samples of this sound as a byte array.
-     */
-    public byte[] getSamples() {
-        return samples;
-    }
-
-    /**
-     * Gets the samples from an AudioInputStream as an array of bytes.
-     */
-    private byte[] getSamples(AudioInputStream audioStream) {
-        // get the number of bytes to read
-        int length = (int) (audioStream.getFrameLength()
-                * format.getFrameSize());
-
-        // read the entire stream
-        byte[] samples = new byte[length];
-        DataInputStream is = new DataInputStream(audioStream);
-        try {
-            is.readFully(samples);
-        } catch (IOException ex) {
-            System.out.println(ex);
-        }
-
-        // return the samples
-        return samples;
-    }
-
-    /**
-     * Plays a stream. This method blocks (doesn't return) until the sound is
-     * finished playing.
-     */
-    public void play(InputStream source) {
-
-        // use a short, 100ms (1/10th sec) buffer for real-time
-        // change to the sound stream
-        int bufferSize = format.getFrameSize()
-                * Math.round(format.getSampleRate() / 10);
-        byte[] buffer = new byte[bufferSize];
-
-        // create a line to play to
-        SourceDataLine line;
-        try {
-            DataLine.Info info
-                    = new DataLine.Info(SourceDataLine.class, format);
-            line = (SourceDataLine) AudioSystem.getLine(info);
-            line.open(format, bufferSize);
-        } catch (LineUnavailableException ex) {
-            System.out.println(ex);
+    /** Load a sound from a resource URL */
+    public Sound(URL url) {
+        if (url == null) {
+            System.out.println("Sound: null URL provided.");
             return;
         }
-
-        // start the line
-        line.start();
-
-        // Continuously read and write audio data to the output line
         try {
-            int numBytesRead = 0;
-            while (numBytesRead != -1) {
-                numBytesRead
-                        = source.read(buffer, 0, buffer.length);
-                if (numBytesRead != -1) {
-                    line.write(buffer, 0, numBytesRead);
-                }
-            }
-        } catch (IOException ex) {
-            System.out.println(ex);
+            AudioInputStream audioIn = AudioSystem.getAudioInputStream(url);
+            initClip(audioIn);
+        } catch (Exception e) {
+            System.out.println("Sound: failed to load from URL - " + e.getMessage());
         }
+    }
+    
+    /** Initialize clip and controls */
+    private void initClip(AudioInputStream audioIn) throws LineUnavailableException, IOException {
+        clip = AudioSystem.getClip();
+        clip.open(audioIn);
 
-        // wait until all data is played
-        line.drain();
-
-        // close the line
-        line.close();
-
+        if (clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+            volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+        }
     }
 
+    /** Play once from start */
+    public void play() {
+        if (clip == null) return;
+        if (clip.isRunning()) clip.stop();
+        clip.setFramePosition(0);
+        clip.start();
+    }
+
+    /** Loop continuously until stop() is called */
+    public void loop() {
+        if (clip == null) return;
+        if (clip.isRunning()) clip.stop();
+        clip.setFramePosition(0);
+        clip.loop(Clip.LOOP_CONTINUOUSLY);
+    }
+
+    /** Stop the sound */
+    public void stop() {
+        if (clip != null) {
+            clip.stop();
+            clip.setFramePosition(0);
+        }
+    }
+
+    /** Adjust volume in decibels (-80 to +6). 0 = default volume */
+    public void setVolume(float dB) {
+        if (volumeControl != null) {
+            float min = volumeControl.getMinimum();
+            float max = volumeControl.getMaximum();
+            float clamped = Math.max(min, Math.min(dB, max));
+            volumeControl.setValue(clamped);
+        }
+    }
+
+    /** Close the clip and release resources */
+    public void close() {
+        if (clip != null) {
+            clip.stop();
+            clip.close();
+        }
+    }
 }

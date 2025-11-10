@@ -6,9 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.InputStream;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -108,13 +106,10 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
                 public void run() {
                     Sound sound = null;
                     try {
-                        sound
-                                = new Sound(getClass().getResource("/sounds/guess.wav"));
+                        new Sound(getClass().getResource("/sounds/guess.wav")).play();
                     } catch (Exception e) {
+                        System.out.println(e);
                     }
-                    InputStream stream
-                            = new ByteArrayInputStream(sound.getSamples());
-                    sound.play(stream);
                 }
             }.start();
             
@@ -157,13 +152,10 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
                                 public void run() {
                                     Sound sound = null;
                                     try {
-                                        sound
-                                                = new Sound(getClass().getResource("/sounds/won.wav"));
+                                        new Sound(getClass().getResource("/sounds/guess.wav")).play();
                                     } catch (Exception e) {
+                                        System.out.println(e);
                                     }
-                                    InputStream stream
-                                            = new ByteArrayInputStream(sound.getSamples());
-                                    sound.play(stream);
                                 }
                             }.start();
                             JOptionPane.showMessageDialog(gamePanel, "You Won! Your Score is " + score);
@@ -173,13 +165,10 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
                                 public void run() {
                                     Sound sound = null;
                                     try {
-                                        sound
-                                                = new Sound(getClass().getResource("/sounds/loose.wav"));
+                                        new Sound(getClass().getResource("/sounds/guess.wav")).play();
                                     } catch (Exception e) {
+                                        System.out.println(e);
                                     }
-                                    InputStream stream
-                                            = new ByteArrayInputStream(sound.getSamples());
-                                    sound.play(stream);
                                 }
                             }.start();
                             JOptionPane.showMessageDialog(gamePanel, "You Loose! Your Score is " + score);
