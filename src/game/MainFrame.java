@@ -14,21 +14,24 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+
 /**
- *
- * @author Rajesh Kumar Sahanee
+ * 
+ * MainFrame.java - The main window of the Matching Game.
+ * Handles user interaction, tile setup, score tracking, and sound effects.
+ * Implements ActionListener to handle user clicks on tiles
  */
+
 public class MainFrame extends javax.swing.JFrame implements ActionListener {
 
-    /**
-     * Creates new form MainFrame
-     */
+    /** Constructor initializes the main game window, icons, and game board. */
     public MainFrame() {
         initComponents();
         initIcons();
         initGame();
     }
 
+    /** Initializes the game by resetting the board, score, and tiles. */
     private void initGame() {
         score = 0;
         int x = 0;
@@ -45,6 +48,7 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
 
     }
 
+    /** Loads and scales all tile images used in the game. */
     private void initIcons() {
         Image img;
         for (int i = 0; i < icons.length; i++) {
@@ -54,6 +58,7 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
 
     }
 
+     /** Converts raw image into a scaled ImageIcon for consistent tile display. */
     private ImageIcon createIcon(Image img) {
         BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_RGB);
         bi.createGraphics().drawImage(img, 0, 0, null);
@@ -61,6 +66,7 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
         return new ImageIcon(img);
     }
 
+     /** Shows all tiles briefly as a hint when the user clicks Help. */
     private void showHelp() {
         //if tiles[0] would be null than all the tiles would be null here
         if (tiles[0] != null) {
@@ -70,11 +76,12 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
                     tiles[i].removeActionListener(this);
                 }
             }
-            score -= 50;
+            score -= 50; // penalty for using help
             title.setText("Score: " + score);
         }
     }
 
+     /** Hides all tiles again after showing help. */
     private void hideHelp() {
 
         for (int i = 0; i < tiles.length; i++) {
@@ -86,9 +93,16 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
 
     }
 
+    /**
+     * Checks if two selected tiles match and handles score update,
+     * animations, and sound effects for match/mismatch results.
+     */
     private void check() {
-
+        
+        // If both tiles are different and match correctly
         if (predict1 != predict2 && predict1.getImage() == predict2.getImage()) {
+            
+            // Play correct guess sound
             new Thread() {
                 @Override
                 public void run() {
@@ -102,7 +116,9 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
                             = new ByteArrayInputStream(sound.getSamples());
                     sound.play(stream);
                 }
-            }.start();//sound 
+            }.start();
+            
+            // Animate matched tiles
             new Thread() {
                 @Override
                 public void run() {
@@ -118,8 +134,12 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
                             System.out.println(ex);
                         }
                     }
+                    
+                    // Remove matched tiles
                     predict1.setNoIcon();
                     predict2.setNoIcon();
+                    
+                    // Check if all tiles are matched
                     for (int i = 0; i < tiles.length; i++) {
                         if (!tiles[i].isNoIcon()) {
                             won = false;
@@ -128,6 +148,8 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
                             won = true;
                         }
                     }
+                    
+                    // Play win/lose sound and restart the game
                     if (won) {
                         if (score > 0) {
                             new Thread() {
@@ -143,7 +165,7 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
                                             = new ByteArrayInputStream(sound.getSamples());
                                     sound.play(stream);
                                 }
-                            }.start();//won sound
+                            }.start();
                             JOptionPane.showMessageDialog(gamePanel, "You Won! Your Score is " + score);
                         } else {
                             new Thread() {
@@ -159,19 +181,21 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
                                             = new ByteArrayInputStream(sound.getSamples());
                                     sound.play(stream);
                                 }
-                            }.start();//loose sound
+                            }.start();
                             JOptionPane.showMessageDialog(gamePanel, "You Loose! Your Score is " + score);
                         }
-                        initGame();
+                        initGame(); // Restart Game
                     }
                 }
-            }.start();//animation
+            }.start();
+            
+            // Remove event listeners from matched tiles
             predict1.removeActionListener(this);
             predict2.removeActionListener(this);
             score += 100;
             title.setText("Score: " + score);
 
-        } else {
+        } else { // Mismatch
             predict1.hideTile();
             predict2.hideTile();
             score -= 10;
@@ -179,6 +203,7 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
         }
     }
 
+    /** Randomly shuffles the tiles on the board. */
     private void shuffle() {
         gamePanel.removeAll();
         ArrayList<Integer> al = new ArrayList<Integer>();
@@ -195,12 +220,7 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
         }
     }
 
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
-    @SuppressWarnings("unchecked")
+    
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -318,12 +338,19 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+     /** Handles window close event when user clicks 'X'. */
     private void closeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_closeMouseClicked
         if (evt.getButton() == MouseEvent.BUTTON1) {
             this.dispose();
         }
     }//GEN-LAST:event_closeMouseClicked
 
+    
+    /**
+     * Handles help button clicks:
+     *  - Left click shows all tiles temporarily.
+     *  - Right click toggles control panel visibility.
+     */
     private void helpMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_helpMouseClicked
         if (evt.getButton() == MouseEvent.BUTTON1) {
             if (!helping) {
@@ -354,6 +381,7 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
         }
     }//GEN-LAST:event_helpMouseClicked
 
+     /** Allows moving the window using arrow keys. */
     private void titleKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_titleKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_LEFT) {
             setLocation(getX() - 5, getY());
@@ -369,6 +397,7 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
         }
     }//GEN-LAST:event_titleKeyPressed
 
+    /** Allows player to load custom images for the game. */
     private void loadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadActionPerformed
         JFileChooser chooser = new JFileChooser();
         chooser.setMultiSelectionEnabled(true);
@@ -386,17 +415,17 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
         }
     }//GEN-LAST:event_loadActionPerformed
 
+    /** Starts a new game when Play button is clicked. */
     private void playActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_playActionPerformed
         initGame();
     }//GEN-LAST:event_playActionPerformed
 
+    /** Lets the user drag the window by the title bar. */
     private void titleMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_titleMouseDragged
         setLocation(evt.getXOnScreen() - 300, evt.getYOnScreen());
     }//GEN-LAST:event_titleMouseDragged
 
-    /**
-     * @param args the command line arguments
-     */
+    
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
