@@ -25,6 +25,7 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
     /** Constructor initializes the main game window, icons, and game board. */
     public MainFrame() {
         initComponents();
+        addCustomButtons();
         initIcons();
         initGame();
     }
@@ -413,6 +414,35 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
     private void titleMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_titleMouseDragged
         setLocation(evt.getXOnScreen() - 300, evt.getYOnScreen());
     }//GEN-LAST:event_titleMouseDragged
+    // ⬇️ Paste here — ABOVE main()
+    private void addCustomButtons() {
+    // Change layout to 4 buttons in one row
+      controlPanel.setLayout(new java.awt.GridLayout(1, 4));
+
+    // Restart button
+      javax.swing.JButton restart = new javax.swing.JButton("RESTART");
+      restart.setBackground(new java.awt.Color(153, 0, 153));
+      restart.setForeground(new java.awt.Color(255, 255, 255));
+      restart.setFont(new java.awt.Font("Tahoma", 0, 18));
+      restart.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+      restart.addActionListener(evt -> initGame());
+      controlPanel.add(restart);
+
+    // Exit button
+      javax.swing.JButton exit = new javax.swing.JButton("EXIT");
+      exit.setBackground(new java.awt.Color(153, 0, 153));
+      exit.setForeground(new java.awt.Color(255, 255, 255));
+      exit.setFont(new java.awt.Font("Tahoma", 0, 18));
+      exit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+      exit.addActionListener(evt -> System.exit(0));
+      controlPanel.add(exit);
+}
+
+// ⬇️ This is already in your file — leave it as is
+public static void main(String args[]) {
+    /* Set the Nimbus look and feel */
+    ...
+}
 
     
     public static void main(String args[]) {
