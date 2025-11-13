@@ -167,6 +167,9 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
                                 }
                             }.start();
                             JOptionPane.showMessageDialog(gamePanel, "You Won! Your Score is " + score);
+                              if (score > highScore) {
+                                highScore = score;
+                                highScoreLabel.setText("High Score: " + highScore);
                         } else {
                             new Thread() {
                                 @Override
@@ -180,6 +183,7 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
                                 }
                             }.start();
                             JOptionPane.showMessageDialog(gamePanel, "You Loose! Your Score is " + score);
+                    
                         }
                         initGame(); // Restart Game
                     }
@@ -292,6 +296,11 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
             }
         });
         titlePanel.add(help, java.awt.BorderLayout.LINE_START);
+
+        highScoreLabel = new javax.swing.JLabel("High Score: 0");
+        highScoreLabel.setForeground(java.awt.Color.WHITE);
+        highScoreLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        titlePanel.add(highScoreLabel, java.awt.BorderLayout.SOUTH);
 
         getContentPane().add(titlePanel, java.awt.BorderLayout.NORTH);
 
@@ -516,6 +525,9 @@ public static void main(String args[]) {
         });
     }
 
+    private int highScore = 0;
+    private javax.swing.JLabel highScoreLabel;
+    
     Tile[] tiles = new Tile[36];
     ImageIcon[] icons = new ImageIcon[18];
     int status, score;
