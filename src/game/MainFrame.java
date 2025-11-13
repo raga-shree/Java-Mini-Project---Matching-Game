@@ -21,14 +21,21 @@ import javax.swing.JOptionPane;
  */
 
 public class MainFrame extends javax.swing.JFrame implements ActionListener {
+    private javax.swing.JLabel timerLabel;
+    private javax.swing.JLabel movesLabel;
+    private javax.swing.Timer gameTimer;
+    private int elapsedSeconds = 0;
+    private int moves = 0;
 
     /** Constructor initializes the main game window, icons, and game board. */
     public MainFrame() {
-        initComponents();
-        addCustomButtons();
-        initIcons();
-        initGame();
-    }
+    initComponents();
+    setupTimerAndMoves(); // 👈 add this line
+    initIcons();
+    initGame();
+}
+
+    
 
     /** Initializes the game by resetting the board, score, and tiles. */
     private void initGame() {
@@ -327,6 +334,27 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+    // </editor-fold>                        
+
+// 🕒 Timer and Moves Labels
+private void setupTimerAndMoves() {
+    timerLabel = new javax.swing.JLabel("Time: 0s");
+    movesLabel = new javax.swing.JLabel("Moves: 0");
+    timerLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    movesLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    timerLabel.setForeground(java.awt.Color.WHITE);
+    movesLabel.setForeground(java.awt.Color.WHITE);
+    titlePanel.add(timerLabel, java.awt.BorderLayout.WEST);
+    titlePanel.add(movesLabel, java.awt.BorderLayout.EAST);
+
+    gameTimer = new javax.swing.Timer(1000, new java.awt.event.ActionListener() {
+        @Override
+        public void actionPerformed(java.awt.event.ActionEvent e) {
+            elapsedSeconds++;
+            timerLabel.setText("Time: " + elapsedSeconds + "s");
+        }
+    });
+}
 
      /** Handles window close event when user clicks 'X'. */
     private void closeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_closeMouseClicked
@@ -407,6 +435,11 @@ public class MainFrame extends javax.swing.JFrame implements ActionListener {
 
     /** Starts a new game when Play button is clicked. */
     private void playActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_playActionPerformed
+        elapsedSeconds = 0; // reset timer
+    moves = 0; // reset moves
+    timerLabel.setText("Time: 0s");
+    movesLabel.setText("Moves: 0");
+    gameTimer.start(); // ✅ start timer
         initGame();
     }//GEN-LAST:event_playActionPerformed
 
@@ -508,6 +541,8 @@ public static void main(String args[]) {
         } else if (status == 1) {
             status++;
             predict2 = (Tile) e.getSource();
+            moves++; // ✅ increment moves
+        movesLabel.setText("Moves: " + moves); // ✅ update label on screen
             new Thread() {
                 @Override
                 public void run() {
